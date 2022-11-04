@@ -29,8 +29,6 @@ module.exports = {
   // Create a new user
   createNewUser(req, res) {
     User.create(req.body)
-      .populate('thoughts')
-      .populate('friends')
       .then(async (user) => res.json(user))
       .catch((err) => res.status(500).json(err));
   },
@@ -42,8 +40,6 @@ module.exports = {
       { $set: { username: req.body } },
       { runValidators: true, new: true }
     )
-      .populate('thoughts')
-      .populate('friends')
       .then((user) =>
         !user
           ? res.status(404).json({ message: 'Must input username!' })
@@ -59,6 +55,38 @@ module.exports = {
         !user
           ? res.status(404).json({ message: 'No user found with this id!' })
           : res.json(user)
+      )
+      .catch((err) => res.status(500).json(err));
+  },
+
+  // Add a friend to a user's friend list
+  addFriend(req, res) {
+    User.findOneAndUpdate(
+      { _id: req.params.userId },
+      { $set: { friends: req.body } },
+      { runValidators: true, new: true }
+    )
+      .populate('friends')
+      .then((friend) =>
+        !friend
+          ? res.status(404).json({ message: 'No user with that id!' })
+          : res.json(friend)
+      )
+      .catch((err) => res.status(500).json(err));
+  },
+
+  // Delete a friend from a user's friend list
+  deleteFriend(req, res) {
+    User.findOneAndUpdate(
+      { _id: req.params.userId },
+      { $set: { friends: req.body } },
+      { runValidators: true, new: true }
+    )
+      .populate('friends')
+      .then((friend) =>
+        !friend
+          ? res.status(404).json({ message: 'No user with that id!' })
+          : res.json(friend)
       )
       .catch((err) => res.status(500).json(err));
   },
