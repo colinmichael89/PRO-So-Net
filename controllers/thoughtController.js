@@ -84,14 +84,14 @@ module.exports = {
 
   // Create a reaction
   createReaction(req, res) {
-    Thought.post(
-      { _id: req.params.reactionId },
-      { $push: { reactions: req.body } },
+    Thought.findOneAndUpdate(
+      { _id: req.params.thoughtId },
+      { $addToSet: { reactions: req.body } },
       { runValidators: true, new: true }
     )
       .then((reaction) =>
         !reaction
-          ? res.status(404).json({ message: 'Must input reaction!' })
+          ? res.status(404).json({ message: 'Must enter valid thought ID!' })
           : res.json(reaction)
       )
       .catch((err) => res.status(500).json(err));
@@ -100,7 +100,7 @@ module.exports = {
   // Delete a reaction
   deleteReaction(req, res) {
     Thought.findOneAndUpdate(
-      { _id: req.params.reactionId },
+      { _id: req.params.thoughtId },
       { $pull: { reactions: { reactionId: req.params.reactionId } } },
       { runValidators: true, new: true }
     )
