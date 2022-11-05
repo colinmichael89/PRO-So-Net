@@ -11,7 +11,7 @@ module.exports = {
   },
 
   getSingleThought(req, res) {
-    Thought.findOne({ _id: req.params.ObjectId })
+    Thought.findOne({ _id: req.params.thoughtId })
       .populate('reactions')
       .select('-__v')
       .then(async (thought) =>
@@ -29,13 +29,8 @@ module.exports = {
   createNewThought(req, res) {
     Thought.create(req.body)
       .then((thought) => {
-        !thought
-          ? res.status(404).json({ message: 'Must input thought!' })
-          : console.log('thought created');
-      })
-      .then((thought) => {
         return User.findOneAndUpdate(
-          { username: req.body },
+          { username: thought.username },
           { $addToSet: { thoughts: thought._id } },
           { new: true }
         );
@@ -45,33 +40,44 @@ module.exports = {
           ? res
               .status(404)
               .json({ message: 'Thought created but no user with this id!' })
-          : res.json(user);
+          : res.json({
+              message: `Thought created!`,
+            });
       })
       .catch((err) => res.status(500).json(err));
   },
 
   // Update a thought by id
   updateThought(req, res) {
-    Thought.put(
+    Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
-      { $set: { thoughtText: req.body } },
+      { $set: req.body },
       { runValidators: true, new: true }
     )
-      .then((thought) =>
+      .then((thought) => {
         !thought
-          ? res.status(404).json({ message: 'Must input thought!' })
-          : res.json(thought)
-      )
+          ? res.status(404).json({ message: 'No thought with this id!' })
+          : res.json({
+              message: `Thought updated!`,
+            });
+      })
       .catch((err) => res.status(500).json(err));
   },
 
   // Delete a thought by id
   deleteThought(req, res) {
-    Thought.deleteOne({ _id: req.params.thoughtId })
+    Thought.findOneAndDelete({ _id: req.params.thoughtId })
+      .then((thought) => {
+        return User.findOneAndUpdate(
+          { username: thought.username },
+          { $pull: { thoughts: thought._id } },
+          { new: true }
+        );
+      })
       .then((thought) =>
         !thought
           ? res.status(404).json({ message: 'No thought found with this id!' })
-          : res.json(thought)
+          : res.json({ message: 'Thought deleted!' })
       )
       .catch((err) => res.status(500).json(err));
   },
