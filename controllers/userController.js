@@ -6,15 +6,17 @@ module.exports = {
   // Get all users
   getAllUsers(req, res) {
     User.find()
+      .select('-__v')
       .then(async (users) => res.json(users))
       .catch((err) => res.status(500).json(err));
   },
 
   // Get one user by id
   getSingleUser(req, res) {
-    User.FindOne({ _id: req.params.ObjectId })
+    User.findOne({ _id: req.params.userId })
       .populate('thoughts')
       .populate('friends')
+      .select('-__v')
       .then(async (user) =>
         !user
           ? res.status(404).json({ message: 'No user found with this id!' })
@@ -29,15 +31,16 @@ module.exports = {
   // Create a new user
   createNewUser(req, res) {
     User.create(req.body)
+      .select('-__v')
       .then(async (user) => res.json(user))
       .catch((err) => res.status(500).json(err));
   },
 
   // Update a user by id
   updateUser(req, res) {
-    User.FindOneAndUpdate(
-      { _id: req.params.ObjectId },
-      { $set: { username: req.body } },
+    User.findOneAndUpdate(
+      { _id: req.params.userId },
+      { $set: req.body },
       { runValidators: true, new: true }
     )
       .then((user) =>
@@ -50,7 +53,7 @@ module.exports = {
 
   // Delete a user by id
   deleteUser(req, res) {
-    User.FindOneAndDelete({ _id: req.params.ObjectId })
+    User.findOneAndDelete({ _id: req.params.userId })
       .then((user) =>
         !user
           ? res.status(404).json({ message: 'No user found with this id!' })
@@ -63,7 +66,7 @@ module.exports = {
   addFriend(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.userId },
-      { $push: { friends: { friendiD: req.params.friendId } } },
+      { $push: { friends: req.params.friendId } },
       { runValidators: true, new: true }
     )
       .populate('friends')
@@ -79,7 +82,7 @@ module.exports = {
   deleteFriend(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.userId },
-      { $pull: { friends: { friendId: req.params.friendId } } },
+      { $pull: { friends: req.params.friendId } },
       { runValidators: true, new: true }
     )
       .populate('friends')

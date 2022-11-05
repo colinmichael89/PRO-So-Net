@@ -5,13 +5,15 @@ module.exports = {
   getAllThoughts(req, res) {
     Thought.find()
       .populate('reactions')
+      .select('-__v')
       .then(async (thoughts) => res.json(thoughts))
       .catch((err) => res.status(500).json(err));
   },
 
   getSingleThought(req, res) {
-    Thought.FindOne({ _id: req.params.thoughtId })
+    Thought.findOne({ _id: req.params.ObjectId })
       .populate('reactions')
+      .select('-__v')
       .then(async (thought) =>
         !thought
           ? res.status(404).json({ message: 'No thought found with this id!' })
@@ -25,12 +27,26 @@ module.exports = {
 
   // Create a new thought
   createNewThought(req, res) {
-    Thought.post(req.body)
-      .then(async (thought) =>
+    Thought.create(req.body)
+      .then((thought) => {
         !thought
           ? res.status(404).json({ message: 'Must input thought!' })
-          : res.json(thought)
-      )
+          : console.log('thought created');
+      })
+      .then((thought) => {
+        return User.findOneAndUpdate(
+          { username: req.body },
+          { $addToSet: { thoughts: thought._id } },
+          { new: true }
+        );
+      })
+      .then((user) => {
+        !user
+          ? res
+              .status(404)
+              .json({ message: 'Thought created but no user with this id!' })
+          : res.json(user);
+      })
       .catch((err) => res.status(500).json(err));
   },
 
