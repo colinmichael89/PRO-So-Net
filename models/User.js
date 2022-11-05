@@ -1,7 +1,6 @@
 const { Schema, Types, model } = require('mongoose');
 const Thought = require('./Thought');
-
-import { isEmail } from 'validator';
+const validator = require('validator');
 
 const userSchema = new Schema(
   {
@@ -16,7 +15,7 @@ const userSchema = new Schema(
       required: 'Email address is required!',
       unique: true,
       validate: {
-        validator: isEmail,
+        validator: validator.isEmail,
         message: 'Please enter a valid email',
         // isAsync: false,
       },
