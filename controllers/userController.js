@@ -29,7 +29,6 @@ module.exports = {
   // Create a new user
   createNewUser(req, res) {
     User.create(req.body)
-      .select('-__v')
       .then(async (user) => res.json(user))
       .catch((err) => res.status(500).json(err));
   },
