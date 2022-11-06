@@ -12,8 +12,6 @@ This application is the back-end API routes for a social media network. Users ha
 
 - [Installation](#installation)
 - [Video](#video)
-- [License](#license)
-- [Contributing](#contributing)
 - [Technologies](#technologies)
 - [Questions](#questions)
 
