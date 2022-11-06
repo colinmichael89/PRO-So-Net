@@ -6,7 +6,7 @@ Professional Social Network
 
 ## Description
 
-This application is designed to...
+This application is the back-end API routes for a social media network. Users have the ability to create a user, post thoughts, edit thoughts, delete thoughts, and add and delete friends. Users also have the ability to react to other users thoughts. These reactions can also be edited and deleted.
 
 ## Table of Contents
 
@@ -33,14 +33,14 @@ npm start
 
 ## Video
 
-[Video]()
+[Video](https://drive.google.com/file/d/1qEUxW5V01yX5yxakEIbi4ZkZT4N094Jn/view)
 
 ## Technologies
 
 - Express
 - MongoDB
 - Mongoose
-- Validator
+- Validator - npm package used for email validation
 
 ## Questions
 
